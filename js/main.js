@@ -3,7 +3,9 @@ import { setupMenu } from "./ui/menu.js";
 import { setupInputs } from "./ui/inputs.js";
 import { setupMapEvents } from "./map/mapEvents.js";
 import { updateHint } from "./ui/hints.js";
-import { initFuelStations} from "./fuelStations.js";
+import { initFuelStations } from "./fuelStations.js";
+import { renderFuelStationMarkers } from "./map/stationMarkers.js";
+import { state } from "./state.js";
 
 function startApp() {
     initMap();
@@ -12,6 +14,11 @@ function startApp() {
     setupInputs();
     setupMapEvents();
     updateHint();
+
+    const badge = document.getElementById("stationsCountBadge");
+    if (badge) {
+        badge.textContent = state.fuelStations.length;
+    }
 }
 
 startApp();
@@ -47,4 +54,48 @@ if (navStationsBtn && stationsFiltersBar) {
         stationsFiltersBar.classList.toggle("active");
         navStationsBtn.classList.toggle("active");
     });
+}
+
+const stationNameSearch = document.getElementById("stationNameSearch");
+const brandQuickFilter = document.getElementById("brandQuickFilter");
+const fuelQuickFilter = document.getElementById("fuelQuickFilter");
+const stationsCountBadge = document.getElementById("stationsCountBadge");
+
+function applyStationFilters() {
+    const nameQuery = stationNameSearch ? stationNameSearch.value.trim().toLowerCase() : "";
+    const brand = brandQuickFilter ? brandQuickFilter.value : "";
+    const fuel = fuelQuickFilter ? fuelQuickFilter.value : "";
+
+    const filtered = state.fuelStations.filter((station) => {
+        const matchesName = !nameQuery ||
+            (station.name && station.name.toLowerCase().includes(nameQuery)) ||
+            (station.brand && station.brand.toLowerCase().includes(nameQuery)) ||
+            (station.address && station.address.toLowerCase().includes(nameQuery)) ||
+            (station.city && station.city.toLowerCase().includes(nameQuery));
+
+        const matchesBrand = !brand ||
+            (station.brand && station.brand.toLowerCase().replace(/\s+/g, "") === brand.toLowerCase());
+
+        const matchesFuel = !fuel || (station.prices && station.prices[fuel] !== undefined);
+
+        return matchesName && matchesBrand && matchesFuel;
+    });
+
+    renderFuelStationMarkers(filtered);
+
+    if (stationsCountBadge) {
+        stationsCountBadge.textContent = filtered.length;
+    }
+}
+
+if (stationNameSearch) {
+    stationNameSearch.addEventListener("input", applyStationFilters);
+}
+
+if (brandQuickFilter) {
+    brandQuickFilter.addEventListener("change", applyStationFilters);
+}
+
+if (fuelQuickFilter) {
+    fuelQuickFilter.addEventListener("change", applyStationFilters);
 }

@@ -41,10 +41,9 @@ body.dark .loading-screen {
 }
 
 .loading-logo {
-    font-size: 42px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: #1c3f94;
+    height: 120px;
+    width: auto;
+    object-fit: contain;
     padding: 26px 34px;
     border-radius: 24px;
     background: rgba(255, 255, 255, 0.72);
@@ -52,7 +51,6 @@ body.dark .loading-screen {
 }
 
 body.dark .loading-logo {
-    color: #dfe8ff;
     background: rgba(255, 255, 255, 0.06);
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
 }
@@ -221,6 +219,13 @@ body.dark .topbar-filters {
     line-height: 1;
 }
 
+.brand-logo-img {
+    height: 42px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+}
+
 .brand-text {
     font-size: 40px;
     font-weight: 700;
@@ -359,6 +364,36 @@ body.dark .filters-title {
 body.dark .filters-row select {
     color: #d9e1fb;
     border-bottom: 1px solid #34415f;
+}
+
+.filters-search-row {
+    margin-bottom: 14px;
+}
+
+.filters-search-row input {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-bottom: 1px solid #d0d7e3;
+    background: transparent;
+    color: #1f293d;
+    font-size: 16px;
+    outline: none;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.filters-search-row input::placeholder {
+    color: #6b768b;
+}
+
+body.dark .filters-search-row input {
+    color: #d9e1fb;
+    border-bottom: 1px solid #34415f;
+}
+
+body.dark .filters-search-row input::placeholder {
+    color: #8090b0;
 }
 
 /* route panel */

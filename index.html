@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pilstukas</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+
+<div id="loadingScreen" class="loading-screen">
+    <div class="loading-logo">Pilstukas</div>
+</div>
+
+<button class="theme-toggle" id="themeBtn" title="Keisti temą" aria-label="Keisti temą">🌙</button>
+
+<button class="menu-toggle" id="menuToggleBtn" title="Atidaryti meniu" aria-label="Atidaryti meniu">
+    Pasirinkti maršrutą
+</button>
+
+<div class="panel-wrap" id="panelWrap">
+    <div class="panel">
+        <div class="panel-topbar">
+            <div class="panel-badge">Lietuvos maršrutai</div>
+            <button class="close-panel-btn" id="closePanelBtn" title="Uždaryti meniu" aria-label="Uždaryti meniu">×</button>
+        </div>
+
+        <div class="input-group">
+
+            <div class="location-block">
+                <label class="section-label" for="from">Išvykimo vieta</label>
+                <div class="location-row">
+                    <input type="text" id="from" placeholder="Įvesk išvykimo vietą">
+                    <button class="pick-btn" id="pickFromBtn" title="Pasirinkti išvykimo tašką žemėlapyje" aria-label="Pasirinkti išvykimo tašką">📍</button>
+                    <button class="clear-btn" id="clearFromBtn" title="Pašalinti išvykimo tašką" aria-label="Pašalinti išvykimo tašką">×</button>
+                </div>
+            </div>
+
+            <div class="location-block">
+                <label class="section-label" for="to">Atvykimo vieta</label>
+                <div class="location-row">
+                    <input type="text" id="to" placeholder="Įvesk atvykimo vietą">
+                    <button class="pick-btn" id="pickToBtn" title="Pasirinkti atvykimo tašką žemėlapyje" aria-label="Pasirinkti atvykimo tašką">📍</button>
+                    <button class="clear-btn" id="clearToBtn" title="Pašalinti atvykimo tašką" aria-label="Pašalinti atvykimo tašką">×</button>
+                </div>
+            </div>
+
+            <button class="action-btn primary-btn" id="routeBtn">Rodyti maršrutą</button>
+
+            <div class="info-block">
+                <div class="info-line" id="result">Įvesk dvi vietas arba pasirink taškus žemėlapyje.</div>
+                <div class="info-line muted" id="mapHint">Spausk A arba B mygtuką, tada spausk žemėlapyje.</div>
+                <div class="info-line distance-line" id="distanceResult"></div>
+                <div class="info-line" id="fuelResult"></div>
+                <div class="info-line" id="costResult"></div>
+            </div>
+
+            <button class="action-btn fuel-toggle-btn" id="fuelToggleBtn">Pasirinkti kurą</button>
+
+            <div class="fuel-expand" id="fuelExpand">
+                <div class="fuel-row">
+                    <select id="fuelType">
+                        <option value="">Kuro tipas, pasirinktinai</option>
+                        <option value="diesel">Dyzelinas</option>
+                        <option value="petrol98">Benzinas 98</option>
+                        <option value="petrol95">Benzinas 95</option>
+                        <option value="lpg">LPG</option>
+                    </select>
+
+                    <input
+                        type="text"
+                        id="consumptionInput"
+                        placeholder="Sąnaudos, L/100km"
+                        disabled
+                    >
+                </div>
+
+                <button class="action-btn calc-btn" id="calcBtn">Skaičiuoti</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="bottom-hud">
+    <button class="hud-btn hud-btn-primary" type="button">Maršrutas</button>
+    <button class="hud-btn" type="button">Lietuva</button>
+    <button class="hud-btn" type="button">Degalinės</button>
+    <button class="hud-btn" type="button">Kuras</button>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module" src="./js/main.js"></script>
+
+</body>
+</html>

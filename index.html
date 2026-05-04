@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pilstukas</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+
+<div id="loadingScreen" class="loading-screen">
+    <img src="./logo.png" alt="Pilstukas" class="loading-logo">
+</div>
+
+<div class="app-hud">
+    <div class="topbar topbar-main">
+        <div class="topbar-inner">
+            <div class="brand-wrap">
+                <img src="./logo.png" alt="Pilstukas" class="brand-logo-img">
+                <div class="brand-text">Pilstukas</div>
+            </div>
+
+            <nav class="top-nav">
+                <button class="top-nav-btn" id="navPricesBtn">Kainos</button>
+                <button class="top-nav-btn" id="navStationsBtn">Degalinės</button>
+                <button class="top-nav-btn" id="navBrandsBtn">Tinklai</button>
+                <button class="top-nav-btn" id="navRouteBtn">Maršrutas</button>
+            </nav>
+
+            <div class="topbar-actions">
+                <button class="theme-toggle topbar-theme-btn" id="themeBtn" title="Keisti temą" aria-label="Keisti temą">🌙</button>
+            </div>
+        </div>
+
+        <div class="topbar-blue-line"></div>
+    </div>
+
+    <div class="topbar topbar-filters hidden-filters" id="stationsFiltersBar">
+        <div class="topbar-inner filters-inner">
+            <div class="filters-title-row">
+                <div class="filters-title">
+                    Visos degalinės
+                    <span class="filters-count" id="stationsCountBadge">***</span>
+                </div>
+
+                <button class="station-toggle-fab" id="toggleStationsBtn" type="button" title="Slėpti degalines" aria-label="Slėpti degalines" aria-pressed="true">
+                    <svg class="station-toggle-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                        <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 56V12c0-3 2-5 5-5h19c3 0 5 2 5 5v44"/>
+                            <path d="M14 56h37"/>
+                            <rect x="24" y="15" width="17" height="14" rx="2"/>
+                            <path d="M47 18h4l5 6v22c0 4-3 7-7 7h-2"/>
+                            <path d="M52 24l-4 4"/>
+                            <path d="M25 38h15"/>
+                            <path d="M25 45h15"/>
+                        </g>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="filters-search-row">
+                <input type="text" id="stationNameSearch" placeholder="Ieškoti degalinės pagal pavadinimą...">
+            </div>
+
+            <div class="filters-row">
+                <select id="countryFilter">
+                    <option value="lt">Lietuva</option>
+                </select>
+
+                <select id="fuelQuickFilter">
+                    <option value="">Visi degalų tipai</option>
+                    <option value="diesel">Dyzelinas</option>
+                    <option value="petrol95">Benzinas 95</option>
+                    <option value="petrol98">Benzinas 98</option>
+                    <option value="lpg">LPG</option>
+                </select>
+
+                <select id="brandQuickFilter">
+                    <option value="">Visi tinklai</option>
+                    <option value="viada">Viada</option>
+                    <option value="circlek">Circle K</option>
+                    <option value="neste">Neste</option>
+                    <option value="orlen">ORLEN</option>
+                    <option value="balticpetroleum">Baltic Petroleum</option>
+                    <option value="emsi">Emsi</option>
+                    <option value="saurida">Saurida</option>
+                    <option value="jozita">Jozita</option>
+                    <option value="alauša">Alauša</option>
+                    <option value="eniris">Eniris</option>
+                    <option value="trevena">Trevena</option>
+                    <option value="stateta">Stateta</option>
+                    <option value="gelvybė">Gelvybė</option>
+                    <option value="apsaga">Apsaga</option>
+                    <option value="boostpetrol">Boost Petrol</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-wrap" id="panelWrap">
+    <div class="panel">
+        <div class="panel-topbar">
+            <div class="panel-badge">Lietuvos maršrutai</div>
+            <button class="close-panel-btn" id="closePanelBtn" title="Uzdaryti meniu" aria-label="Uzdaryti meniu">×</button>
+        </div>
+
+        <div class="input-group">
+            <div class="location-block">
+                <label class="section-label" for="from">Išvykimo vieta</label>
+                <div class="location-row">
+                    <button class="pick-btn" id="pickFromBtn">📍</button>
+                    <input type="text" id="from" placeholder="Įvesk išvykimo vietą">
+                    <button class="move-btn" id="moveFromUpBtn" type="button">↑</button>
+                    <button class="move-btn" id="moveFromDownBtn" type="button">↓</button>
+                    <button class="clear-btn" id="clearFromBtn">×</button>
+                </div>
+            </div>
+
+            <div class="stops-header">
+                <span class="section-label">Tarpinės stotelės</span>
+                <button class="add-stop-btn" id="addStopBtn" type="button">+</button>
+            </div>
+
+            <div id="waypointContainer"></div>
+
+            <div class="location-block">
+                <label class="section-label" for="to">Atvykimo vieta</label>
+                <div class="location-row">
+                    <button class="pick-btn" id="pickToBtn">📍</button>
+                    <input type="text" id="to" placeholder="Įvesk atvykimo vietą">
+                    <button class="move-btn" id="moveToUpBtn" type="button">↑</button>
+                    <button class="move-btn" id="moveToDownBtn" type="button">↓</button>
+                    <button class="clear-btn" id="clearToBtn">×</button>
+                </div>
+            </div>
+
+            <button class="action-btn primary-btn" id="routeBtn">Rodyti maršrutą</button>
+
+            <div class="info-block">
+                <div class="info-line" id="result">Įvesk bent pradžią ir pabaigą.</div>
+                <div class="info-line muted" id="mapHint">Maršrutas skaičiuojamas iš viršaus į apačią.</div>
+                <div class="info-line distance-line" id="distanceResult"></div>
+                <div class="info-line" id="fuelResult"></div>
+                <div class="info-line" id="costResult"></div>
+            </div>
+
+            <button class="action-btn fuel-toggle-btn" id="fuelToggleBtn">Pasirinkti kurą</button>
+
+            <div class="fuel-expand" id="fuelExpand">
+                <div class="fuel-row">
+                    <select id="fuelType">
+                        <option value="">Kuro tipas, pasirinktinai</option>
+                        <option value="diesel">Dyzelinas</option>
+                        <option value="petrol98">Benzinas 98</option>
+                        <option value="petrol95">Benzinas 95</option>
+                        <option value="lpg">LPG</option>
+                    </select>
+
+                    <input type="text" id="consumptionInput" placeholder="Sąnaudos, L/100km" disabled>
+                </div>
+
+                <button class="action-btn calc-btn" id="calcBtn">🔍 Skaičiuoti</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="map"></div>
+
+<div id="modal-overlay" class="modal-overlay hidden"></div>
+
+<div id="kainos-modal" class="modal hidden">
+    <div class="modal-header">
+        <h2>Kainų statistika</h2>
+        <button class="modal-close" data-close="true">×</button>
+    </div>
+
+    <div class="modal-body">
+        <select id="kainosFuelSelect" class="modal-select">
+            <option value="diesel">Dyzelinas</option>
+            <option value="petrol95">Benzinas 95</option>
+            <option value="petrol98">Benzinas 98</option>
+            <option value="lpg">LPG</option>
+        </select>
+
+        <canvas id="kainos-chart"></canvas>
+    </div>
+</div>
+
+<div id="tinklai-modal" class="modal hidden">
+    <div class="modal-header">
+        <h2>Degalinių tinklai</h2>
+        <button class="modal-close" data-close="true">×</button>
+    </div>
+
+    <div class="modal-body">
+        <select id="tinklaiFuelSelect" class="modal-select">
+            <option value="diesel">Dyzelinas</option>
+            <option value="petrol95">Benzinas 95</option>
+            <option value="petrol98">Benzinas 98</option>
+            <option value="lpg">LPG</option>
+        </select>
+
+        <div id="tinklai-list"></div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module" src="./js/main.js"></script>
+
+</body>
+</html>

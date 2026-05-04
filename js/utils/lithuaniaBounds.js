@@ -5,11 +5,6 @@ export const LITHUANIA_BOUNDS = {
     maxLon: 26.84
 };
 
-export const LITHUANIA_VIEW_BOUNDS = [
-    [53.30, 19.80],
-    [57.00, 27.60]
-];
-
 export function isPointInLithuania(lat, lon) {
     return (
         lat >= LITHUANIA_BOUNDS.minLat &&

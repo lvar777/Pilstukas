@@ -2,17 +2,35 @@ import { state } from "../state.js";
 import { buildStationPopup } from "./stationPopup.js";
 import { filterStationsInLithuania } from "../utils/lithuaniaBounds.js";
 
-function createFuelStationIcon() {
+function getLogoUrl(station) {
+    const brand = (station.brand || station.name || station.operator || "").toLowerCase();
+
+    if (brand.includes("circle")) return "assets/logos/cirklek.png";
+    if (brand.includes("viada")) return "assets/logos/viada.png";
+    if (brand.includes("baltic") || brand.includes("bp")) return "assets/logos/bp.png";
+    if (brand.includes("neste")) return "assets/logos/neste.png";
+    if (brand.includes("orlen")) return "assets/logos/orlen.png";
+
+    return null;
+}
+
+function createFuelStationIcon(station) {
+    const logoUrl = getLogoUrl(station);
+
+    const content = logoUrl
+        ? `<img src="${logoUrl}" alt="">`
+        : `<span class="fuel-station-icon-symbol">⛽</span>`;
+
     return L.divIcon({
         className: "fuel-station-icon-wrapper",
         html: `
-            <div class="fuel-station-icon" aria-hidden="true">
-                <span class="fuel-station-icon-symbol">⛽</span>
+            <div class="fuel-logo-marker">
+                ${content}
             </div>
         `,
-        iconSize: [34, 34],
-        iconAnchor: [17, 34],
-        popupAnchor: [0, -28]
+        iconSize: [42, 42],
+        iconAnchor: [21, 42],
+        popupAnchor: [0, -36]
     });
 }
 
@@ -60,11 +78,14 @@ export function renderFuelStationMarkers(stations) {
 
     clearFuelStationMarkers();
 
-    const icon = createFuelStationIcon();
     const lithuanianStations = filterStationsInLithuania(stations);
 
     const markers = lithuanianStations.map((station) => {
-        const marker = L.marker([station.lat, station.lon], { icon: icon });
+        const icon = createFuelStationIcon(station);
+
+        const marker = L.marker([station.lat, station.lon], {
+            icon: icon
+        });
 
         marker.bindPopup(buildStationPopup(station), {
             closeButton: false,
